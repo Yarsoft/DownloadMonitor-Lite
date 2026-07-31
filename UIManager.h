@@ -81,9 +81,6 @@ private:
 	static LRESULT ChildProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static INT_PTR AboutProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	Vector2 GetCentredXYPos(HWND hWnd);
-#ifdef MS_STORE
-	static INT_PTR MsStoreFirstRunProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-#endif
 	static INT_PTR SettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	static INT_PTR OpacityProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	void ForceRepaint();

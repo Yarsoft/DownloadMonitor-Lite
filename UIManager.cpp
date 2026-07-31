@@ -7,6 +7,9 @@ UIManager* UIManager::instance = NULL;
 NetworkManager* UIManager::netManager = NULL;
 ConfigManager* UIManager::configManager = NULL;
 
+#define DL_TEXT_COLOUR RGB(225, 225, 225)
+#define UL_TEXT_COLOUR RGB(10, 225, 10)
+
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -67,11 +70,8 @@ UIManager::UIManager(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	//Show the first run message if it's our first time running
 	if(!configManager->shownFirstRunMsg)
 	{
-#ifndef MS_STORE
 		DialogBox(instance->hInst, MAKEINTRESOURCE(IDD_FIRSTRUN), roothWnd, AboutProc); //Just re-use this proc as it does the same thing
-#else
-		DialogBox(instance->hInst, MAKEINTRESOURCE(IDD_FIRSTRUN_MSSTORE), roothWnd, MsStoreFirstRunProc); //Just re-use this proc as it does the same thing
-#endif
+
 		configManager->UpdateShowFirstRunMsg(true);
 	}
 
@@ -280,12 +280,12 @@ LRESULT CALLBACK UIManager::ChildProc(HWND hWnd, UINT message, WPARAM wParam, LP
 			SetBkMode(hdc, TRANSPARENT);
 			if (hWnd == instance->dlChildWindow)
 			{
-				SetTextColor(hdc, RGB(200, 10, 10));
+				SetTextColor(hdc, DL_TEXT_COLOUR);
 				DrawText(hdc, instance->dlBuf, lstrlenW(instance->dlBuf), &ps.rcPaint, DT_CENTER | DT_VCENTER);
 			}
 			else if (hWnd == instance->ulChildWindow)
 			{
-				SetTextColor(hdc, RGB(10, 200, 10));
+				SetTextColor(hdc, UL_TEXT_COLOUR);
 				DrawText(hdc, instance->ulBuf, lstrlenW(instance->ulBuf), &ps.rcPaint, DT_CENTER | DT_VCENTER);
 			}
 			EndPaint(hWnd, &ps);
@@ -500,39 +500,6 @@ Vector2 UIManager::GetCentredXYPos(HWND hWnd)
 
 	return Vector2(xPos, yPos);
 }
-
-#ifdef MS_STORE
-INT_PTR CALLBACK UIManager::MsStoreFirstRunProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-		case WM_INITDIALOG:
-		{
-			Vector2 v = instance->GetCentredXYPos(hDlg);
-			SetWindowPos(hDlg, HWND_TOP, v.x, v.y, 0, 0, SWP_NOSIZE);
-			return (INT_PTR)TRUE;
-		}
-
-		case WM_COMMAND:
-		{
-			if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-			{
-				EndDialog(hDlg, LOWORD(wParam));
-				return (INT_PTR)TRUE;
-			}
-			if (LOWORD(wParam) == IDC_STORE_LINK)
-			{
-				ShellExecute(NULL, L"open", STORE_URL, NULL, NULL, SW_SHOW);
-				return (INT_PTR)TRUE;
-			}
-			break;
-		}
-	}
-
-	return (INT_PTR)FALSE;
-}
-#endif
 
 INT_PTR CALLBACK UIManager::SettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
